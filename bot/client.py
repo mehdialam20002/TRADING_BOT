@@ -11,9 +11,9 @@ class BinanceFuturesClient:
         api_secret = os.getenv("BINANCE_API_SECRET")
 
         if not api_key or not api_secret:
-            raise Exception("API keys not found")
+            raise Exception("API keys not found in environment variables")
 
-        # ✅ Correct Futures Testnet client
+        # Futures Testnet client
         self.client = Client(
             api_key=api_key,
             api_secret=api_secret,
@@ -23,7 +23,7 @@ class BinanceFuturesClient:
         # Futures Testnet base URL
         self.client.FUTURES_URL = "https://testnet.binancefuture.com"
 
-        # 🔥 CORRECT timestamp sync (no private methods)
+        # 🔥 Timestamp sync (required for Futures)
         server_time = self.client.futures_time()["serverTime"]
         local_time = int(time.time() * 1000)
         self.client.timestamp_offset = server_time - local_time

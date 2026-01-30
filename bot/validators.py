@@ -13,3 +13,7 @@ def validate_quantity(quantity: float):
 def validate_price(price, order_type):
     if order_type == "LIMIT" and price is None:
         raise ValueError("price is required for LIMIT orders")
+def validate_order_type(order_type: str):
+    allowed = ["MARKET", "LIMIT", "STOP_LIMIT"]
+    if order_type not in allowed:
+        raise ValueError(f"order_type must be one of {allowed}")

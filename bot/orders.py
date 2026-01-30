@@ -7,27 +7,45 @@ class OrderService:
     def __init__(self):
         self.client = BinanceFuturesClient()
 
-    def place_order(self, symbol, side, order_type, quantity, price=None):
+    def place_order(
+        self,
+        symbol: str,
+        side: str,
+        order_type: str,
+        quantity: float,
+        price: float = None,
+        stop_price: float = None
+    ):
         try:
-            logger.info(
-                f"Request: symbol={symbol}, side={side}, type={order_type}, "
-                f"quantity={quantity}, price={price}"
-            )
-
             order_params = {
                 "symbol": symbol,
                 "side": side,
-                "type": order_type,
                 "quantity": quantity,
             }
 
-            if order_type == "LIMIT":
-                order_params["price"] = price
-                order_params["timeInForce"] = "GTC"
+            if order_type == "MARKET":
+                order_params["type"] = "MARKET"
 
+            elif order_type == "LIMIT":
+                order_params.update({
+                    "type": "LIMIT",
+                    "price": price,
+                    "timeInForce": "GTC",
+                })
+
+            elif order_type == "STOP_LIMIT":
+                # ✅ Correct Futures STOP-LIMIT
+                order_params.update({
+                    "type": "STOP",
+                    "price": price,
+                    "triggerPrice": stop_price,   # 🔥 Futures uses triggerPrice
+                    "timeInForce": "GTC",
+                })
+
+            logger.info(f"Request: {order_params}")
             response = self.client.place_order(**order_params)
-
             logger.info(f"Response: {response}")
+
             return response
 
         except Exception as e:
